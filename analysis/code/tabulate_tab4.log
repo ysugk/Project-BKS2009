@@ -1,0 +1,212 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   16.1   Copyright 1985-2019 StataCorp LLC
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     Special Edition                  College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+Single-user Stata license expires  5 Jul 2021:
+       Serial number:  401609700731
+         Licensed to:  Yongseok Kim
+                       Indiana University Bloomington
+
+Notes:
+      1.  Stata is running in batch mode.
+      2.  Unicode is supported; see help unicode_advice.
+      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+
+. do tabulate_tab4 
+
+. clear all
+
+. set more off
+
+. 
+. cd ~/Projects/Replication/BKS2009
+/Users/apple/Projects/Replication/BKS2009
+
+. use analysis/temp/prepared, replace
+
+. 
+. * Same winsorizing
+. replace lev = 1 if lev > 1
+(1,770 real changes made)
+
+. replace lev = 0 if lev < 0
+(0 real changes made)
+
+. winsor2 rd aqc_at capx_at, c(1 99) replace
+
+. winsor2 nwc ocf, c(1 100) replace
+
+. winsor2 mtb, c(0 99) replace
+
+. 
+. winsor2 cfvol, c(1 99) replace
+
+. 
+. * Generate industry sigma
+. preserve
+
+. collapse (mean) ind_cfvol = cfvol, by(fyear sic2)
+
+. la var ind_cfvol "Industry sigma"
+
+. tempfile ind_cfvol
+
+. save `ind_cfvol'
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St42671.000002 saved
+
+. restore
+
+. 
+. merge m:1 fyear sic2 using `ind_cfvol'
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                           116,655  (_merge==3)
+    -----------------------------------------
+
+. 
+. * Calculate predicted cash ratio
+. gen pcashr = 0.307 + 0.230 * ind_cfvol + 0.006 * mtb - 0.009 * size + 0.077 *
+>  ocf - 0.238 * nwc - 0.372 * capx_at - 0.360 * lev + 0.048 * rd - 0.024 * div
+> _dum - 0.233 * aqc_at + 0.158 * nei + 0.190 * ndi
+(30,180 missing values generated)
+
+. 
+. * Whole sample
+. foreach year of num 1990/2006 {
+  2.         qui ttest cashr == pcashr if fyear == `year'
+  3.         matrix temp`year' = (r(mu_2), r(mu_1) - r(mu_2), r(t))
+  4.         matrix rownames temp`year' = `year'
+  5. }
+
+. 
+. mat temp = temp1990
+
+. 
+. foreach year of num 1991/2006 {
+  2.         mat temp = temp \ temp`year'
+  3. }
+
+. 
+. mat coln temp = pred diff t
+
+. 
+. ereturn post
+
+. estadd matrix A = temp'
+
+added matrix:
+                  e(A) :  3 x 17
+
+. eststo whole
+
+. 
+. * S&P 500 Firms
+. foreach year of num 1990/2006 {
+  2.         qui ttest cashr == pcashr if fyear == `year' & sp500 == 1
+  3.         matrix temp`year' = (r(mu_2), r(mu_1) - r(mu_2), r(t))
+  4.         matrix rownames temp`year' = `year'
+  5. }
+
+. 
+. mat temp = temp1990
+
+. 
+. foreach year of num 1991/2006 {
+  2.         mat temp = temp \ temp`year'
+  3. }
+
+. 
+. mat coln temp = pred diff t
+
+. 
+. ereturn post
+
+. estadd matrix A = temp'
+
+added matrix:
+                  e(A) :  3 x 17
+
+. eststo sp
+
+. 
+. * Dividend
+. foreach year of num 1990/2006 {
+  2.         qui ttest cashr == pcashr if fyear == `year' & div_dum == 1
+  3.         matrix temp`year' = (r(mu_2), r(mu_1) - r(mu_2), r(t))
+  4.         matrix rownames temp`year' = `year'
+  5. }
+
+. 
+. mat temp = temp1990
+
+. 
+. foreach year of num 1991/2006 {
+  2.         mat temp = temp \ temp`year'
+  3. }
+
+. 
+. mat coln temp = pred diff t
+
+. 
+. ereturn post
+
+. estadd matrix A = temp'
+
+added matrix:
+                  e(A) :  3 x 17
+
+. eststo div
+
+. 
+. * Non-dividend
+. foreach year of num 1990/2006 {
+  2.         qui ttest cashr == pcashr if fyear == `year' & div_dum == 0
+  3.         matrix temp`year' = (r(mu_2), r(mu_1) - r(mu_2), r(t))
+  4.         matrix rownames temp`year' = `year'
+  5. }
+
+. 
+. mat temp = temp1990
+
+. 
+. foreach year of num 1991/2006 {
+  2.         mat temp = temp \ temp`year'
+  3. }
+
+. 
+. mat coln temp = pred diff t
+
+. 
+. ereturn post
+
+. estadd matrix A = temp'
+
+added matrix:
+                  e(A) :  3 x 17
+
+. eststo nodiv
+
+. 
+. esttab whole sp div nodiv using "analysis/output/tab/tab4.tex", replace bookt
+> abs cell((A["pred"](fmt(%4.3f)) A["diff"](fmt(%4.3f)) A["t"](fmt(%3.2f)))) no
+> obs nomtitles msign("$-$") ///
+> mgroups("Whole Sample" "S\&P 500 Firms" "Firms Paying a Dividend" "Firms Not 
+> Paying a Dividend", pattern(1 1 1 1) ///
+> prefix(\multicolumn{@span}{c}{) suffix(}) ///
+> span erepeat("\cmidrule(lr){@span}")) ///
+> collabels("Predicted" "Actual $-$ \\ Predicted" "\textit{t}-statistic", ///
+> prefix("\multicolumn{@span}{p{1.5cm}}{\centering ") suffix("}")) ///
+> nonumbers
+(output written to analysis/output/tab/tab4.tex)
+
+. 
+end of do-file

@@ -1,0 +1,69 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   16.1   Copyright 1985-2019 StataCorp LLC
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     Special Edition                  College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+Single-user Stata license expires  5 Jul 2021:
+       Serial number:  401609700731
+         Licensed to:  Yongseok Kim
+                       Indiana University Bloomington
+
+Notes:
+      1.  Stata is running in batch mode.
+      2.  Unicode is supported; see help unicode_advice.
+      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+
+. do draw_figure1 
+
+. clear all
+
+. set more off
+
+. set graphics off
+
+. 
+. cd "~/Projects/Replication/BKS2009"
+/Users/apple/Projects/Replication/BKS2009
+
+. use "analysis/temp/prepared", replace
+
+. 
+. bysort fyear: egen size_rank = rank(lag1_at)
+(11,121 missing values generated)
+
+. bysort fyear: egen size_n = count(lag1_at)
+
+. gen size_pct = (size_rank - 1)/size_n
+(11,121 missing values generated)
+
+. egen size_group = cut(size_pct), at(0 0.2 0.4 0.6 0.8 1) icodes
+(11,121 missing values generated)
+
+. collapse (mean) mean_cashr = cashr, by(fyear size_group)
+
+. 
+. qui twoway  ///
+> (scatter mean_cashr fyear if size_group == 4, con(l)) ///
+> (scatter mean_cashr fyear if size_group == 3, con(l)) ///
+> (scatter mean_cashr fyear if size_group == 2, con(l)) ///
+> (scatter mean_cashr fyear if size_group == 1, con(l)) ///
+> (scatter mean_cashr fyear if size_group == 0, con(l)), ///
+> legend(label(1 "Q5: Largest") label(2 "Q4") label(3 "Q3") label(4 "Q2") label
+> (5 "Q1: Smallest") rows(1) pos(12) size(vsmall)) ///
+> legend(order(5 4 3 2 1)) ///
+> xtitle("Year") ytitle("cash/assets") ///
+> yscale(range(0 0.4)) ylabel(0(0.05)0.4) ///
+> xscale(range(1980 2006)) xlabel(1980(2)2006)
+
+. 
+. graph export "analysis/output/fig/fig1.pdf", replace
+(file analysis/output/fig/fig1.pdf written in PDF format)
+
+. 
+end of do-file

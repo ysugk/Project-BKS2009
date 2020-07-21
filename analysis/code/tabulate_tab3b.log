@@ -1,0 +1,623 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   16.1   Copyright 1985-2019 StataCorp LLC
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     Special Edition                  College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+Single-user Stata license expires  5 Jul 2021:
+       Serial number:  401609700731
+         Licensed to:  Yongseok Kim
+                       Indiana University Bloomington
+
+Notes:
+      1.  Stata is running in batch mode.
+      2.  Unicode is supported; see help unicode_advice.
+      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+
+. do tabulate_tab3b 
+
+. clear all
+
+. set more off
+
+. 
+. cd ~/Projects/Replication/BKS2009
+/Users/apple/Projects/Replication/BKS2009
+
+. use analysis/temp/prepared, replace
+
+. 
+. * Same winsorizing
+. replace lev = 1 if lev > 1
+(1,770 real changes made)
+
+. replace lev = 0 if lev < 0
+(0 real changes made)
+
+. winsor2 rd aqc_at cfvol capx_at, c(1 99) replace
+
+. winsor2 nwc ocf, c(1 100) replace
+
+. winsor2 mtb, c(0 99) replace
+
+. 
+. winsor2 cfvol, c(1 99) replace
+
+. 
+. * Generate industry sigma
+. preserve
+
+. collapse (mean) ind_cfvol = cfvol, by(fyear sic2)
+
+. la var ind_cfvol "Industry sigma"
+
+. tempfile ind_cfvol
+
+. save `ind_cfvol'
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St42668.000002 saved
+
+. restore
+
+. 
+. merge m:1 fyear sic2 using `ind_cfvol'
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                           116,655  (_merge==3)
+    -----------------------------------------
+
+. 
+. gen dum1990 = 0
+
+. replace dum1990 = 1 if fyear >= 1990
+(76,164 real changes made)
+
+. la var dum1990 "1990s dummy"
+
+. gen dum2000 = 0
+
+. replace dum2000 = 1 if fyear >= 2000
+(27,438 real changes made)
+
+. la var dum2000 "2000s dummy"
+
+. 
+. * Model 1
+. global control1 = "c.ind_cfvol c.mtb c.size c.ocf c.nwc c.capx_at c.lev c.rd 
+> i.div_dum c.aqc_at"
+
+. 
+. qui reghdfe cashr ($control1 )##i.dum1990##i.dum2000, noabsorb cl(gvkey fyear
+> )
+
+. mat b = e(b)
+
+. mat V = e(V)
+
+. local r2_ : di %4.3f e(r2_a)
+
+. 
+. mata
+------------------------------------------------- mata (type end to exit) -----
+: b = st_matrix("b")
+
+: V = st_matrix("V")
+
+: V = V[selectindex(b :!= 0), selectindex(b :!= 0)]
+
+: b = b[1, selectindex(b :!= 0)]
+
+: 
+: b1 = b[1, (33, 1..10)]
+
+: V1 = V[(33, 1..10), (33, 1..10)]
+
+: 
+: b2 = b[1, (11..21)]
+
+: V2 = V[(11..21), (11..21)]
+
+: 
+: b3 = b[1, (22..32)]
+
+: V3 = V[(22..32), (22..32)]
+
+: 
+: st_matrix("b1", b1)
+
+: st_matrix("b2", b2)
+
+: st_matrix("b3", b3)
+
+: 
+: st_matrix("V1", V1)
+
+: st_matrix("V2", V2)
+
+: st_matrix("V3", V3)
+
+: end
+-------------------------------------------------------------------------------
+
+. 
+. forvalues i = 1/3 {
+  2.         matrix colnames b`i' = Intercept ind_cfvol mtb size ocf nwc capx_a
+> t lev rd div_dum aqc_at
+  3.         matrix rownames V`i' = Intercept ind_cfvol mtb size ocf nwc capx_a
+> t lev rd div_dum aqc_at
+  4.         matrix colnames V`i' = Intercept ind_cfvol mtb size ocf nwc capx_a
+> t lev rd div_dum aqc_at
+  5. }
+
+. 
+. ereturn post b1 V1
+
+. ereturn display
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   Intercept |   .3185765   .0121169    26.29   0.000     .2948279    .3423252
+   ind_cfvol |   .0749172   .0917802     0.82   0.414    -.1049687    .2548031
+         mtb |   .0112067   .0010872    10.31   0.000     .0090758    .0133377
+        size |  -.0098876   .0011137    -8.88   0.000    -.0120705   -.0077047
+         ocf |   .0289965   .0116746     2.48   0.013     .0061147    .0518783
+         nwc |  -.2190647   .0101686   -21.54   0.000    -.2389949   -.1991345
+     capx_at |  -.2958436   .0231086   -12.80   0.000    -.3411356   -.2505515
+         lev |  -.3632059   .0127139   -28.57   0.000    -.3881247   -.3382872
+          rd |   .0581082   .0043462    13.37   0.000     .0495897    .0666266
+     div_dum |    -.03236   .0046703    -6.93   0.000    -.0415136   -.0232065
+      aqc_at |  -.0992747   .0101214    -9.81   0.000    -.1191123   -.0794371
+------------------------------------------------------------------------------
+
+. eststo est1
+
+. estadd local r2_ "`r2_'"
+
+added macro:
+                e(r2_) : "0.464"
+
+. 
+. ereturn post b2 V2
+
+. ereturn display
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   Intercept |  -.1023826   .0144903    -7.07   0.000    -.1307831   -.0739821
+   ind_cfvol |   .8568781   .1250473     6.85   0.000       .61179    1.101966
+         mtb |   .0077524   .0020018     3.87   0.000      .003829    .0116759
+        size |   .0066412   .0013389     4.96   0.000      .004017    .0092654
+         ocf |  -.0305245   .0153987    -1.98   0.047    -.0607053   -.0003436
+         nwc |  -.0132546   .0149546    -0.89   0.375    -.0425651    .0160559
+     capx_at |  -.0913733   .0271191    -3.37   0.001    -.1445257   -.0382209
+         lev |  -.0078159   .0173186    -0.45   0.652    -.0417596    .0261279
+          rd |  -.0004915   .0048487    -0.10   0.919    -.0099947    .0090118
+     div_dum |  -.0183401   .0053257    -3.44   0.001    -.0287782    -.007902
+      aqc_at |  -.1269761   .0162465    -7.82   0.000    -.1588187   -.0951335
+------------------------------------------------------------------------------
+
+. eststo est2
+
+. 
+. ereturn post b3 V3
+
+. ereturn display
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   Intercept |  -.0068782   .0162429    -0.42   0.672    -.0387136    .0249573
+   ind_cfvol |   .0985297   .1029363     0.96   0.338    -.1032218    .3002812
+         mtb |   .0025096   .0026446     0.95   0.343    -.0026737    .0076929
+        size |   .0014099   .0023687     0.60   0.552    -.0032328    .0060525
+         ocf |  -.0328593   .0195168    -1.68   0.092    -.0711115    .0053929
+         nwc |  -.0340219   .0193781    -1.76   0.079    -.0720023    .0039584
+     capx_at |  -.1336328   .0610289    -2.19   0.029    -.2532473   -.0140184
+         lev |   .0230139   .0207913     1.11   0.268    -.0177363    .0637642
+          rd |   -.002274   .0032532    -0.70   0.485    -.0086502    .0041021
+     div_dum |  -.0092617    .006284    -1.47   0.141    -.0215781    .0030548
+      aqc_at |  -.1253876   .0325064    -3.86   0.000    -.1890989   -.0616762
+------------------------------------------------------------------------------
+
+. eststo est3
+
+. 
+. * Model 2
+. gen ipoyear = fyear - year(ipodate2)
+
+. tabulate ipoyear if ipoyear >= 1 & ipoyear <= 5, generate(ipo)
+
+    ipoyear |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |      9,498       25.37       25.37
+          2 |      8,401       22.44       47.80
+          3 |      7,309       19.52       67.32
+          4 |      6,486       17.32       84.65
+          5 |      5,749       15.35      100.00
+------------+-----------------------------------
+      Total |     37,443      100.00
+
+. 
+. foreach v in ipo1 ipo2 ipo3 ipo4 ipo5 {
+  2.         replace `v' = 0 if missing(`v')
+  3. }
+(79,212 real changes made)
+(79,212 real changes made)
+(79,212 real changes made)
+(79,212 real changes made)
+(79,212 real changes made)
+
+. 
+. la var nei "Net equity issuance"
+
+. la var ndi "Net debt issuance"
+
+. la var neg_ni "Loss dummy"
+
+. la var tb3 "T-bill"
+
+. la var creditspread "Credit spread"
+
+. la var ipo1 "IPO1"
+
+. la var ipo2 "IPO2"
+
+. la var ipo3 "IPO3"
+
+. la var ipo4 "IPO4"
+
+. la var ipo5 "IPO5"
+
+. 
+. global control1 = "c.ind_cfvol c.mtb c.size c.ocf c.nwc c.capx_at c.lev c.rd 
+> i.div_dum c.aqc_at"
+
+. global control2 = "nei ndi neg_ni tb3 creditspread ipo1 ipo2 ipo3 ipo4 ipo5"
+
+. 
+. qui reghdfe cashr ($control1 )##i.dum1990##i.dum2000 $control2, noabsorb cl(g
+> vkey fyear)
+
+. mat b = e(b)
+
+. mat V = e(V)
+
+. local r2_ : di %4.3f e(r2_a)
+
+. 
+. mata
+------------------------------------------------- mata (type end to exit) -----
+: b = st_matrix("b")
+
+: V = st_matrix("V")
+
+: V = V[selectindex(b :!= 0), selectindex(b :!= 0)]
+
+: b = b[1, selectindex(b :!= 0)]
+
+: 
+: b1 = b[1, (43, 1..10, 33..42)]
+
+: V1 = V[(43, 1..10, 33..42), (43, 1..10, 33..42)]
+
+: 
+: b2 = b[1, (11..21)]
+
+: V2 = V[(11..21), (11..21)]
+
+: 
+: b3 = b[1, (22..32)]
+
+: V3 = V[(22..32), (22..32)]
+
+: 
+: st_matrix("b1", b1)
+
+: st_matrix("b2", b2)
+
+: st_matrix("b3", b3)
+
+: 
+: st_matrix("V1", V1)
+
+: st_matrix("V2", V2)
+
+: st_matrix("V3", V3)
+
+: end
+-------------------------------------------------------------------------------
+
+. 
+. matrix colnames b1 = Intercept ind_cfvol mtb size ocf nwc capx_at lev rd div_
+> dum aqc_at $control2
+
+. matrix rownames V1 = Intercept ind_cfvol mtb size ocf nwc capx_at lev rd div_
+> dum aqc_at $control2
+
+. matrix colnames V1 = Intercept ind_cfvol mtb size ocf nwc capx_at lev rd div_
+> dum aqc_at $control2
+
+. 
+. forvalues i = 2/3 {
+  2.         matrix colnames b`i' = Intercept ind_cfvol mtb size ocf nwc capx_a
+> t lev rd div_dum aqc_at
+  3.         matrix rownames V`i' = Intercept ind_cfvol mtb size ocf nwc capx_a
+> t lev rd div_dum aqc_at
+  4.         matrix colnames V`i' = Intercept ind_cfvol mtb size ocf nwc capx_a
+> t lev rd div_dum aqc_at
+  5. }
+
+. 
+. ereturn post b1 V1
+
+. ereturn display
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   Intercept |   .3264821   .0142195    22.96   0.000     .2986124    .3543518
+   ind_cfvol |   .1176862   .0724161     1.63   0.104    -.0242467     .259619
+         mtb |   .0052496    .001306     4.02   0.000     .0026899    .0078093
+        size |  -.0093762   .0011016    -8.51   0.000    -.0115353   -.0072171
+         ocf |   .0833686   .0143168     5.82   0.000     .0553082     .111429
+         nwc |  -.2479755   .0117602   -21.09   0.000    -.2710251   -.2249258
+     capx_at |  -.4194635   .0266415   -15.74   0.000    -.4716799    -.367247
+         lev |  -.3626357   .0128123   -28.30   0.000    -.3877473    -.337524
+          rd |   .0492061   .0046778    10.52   0.000     .0400377    .0583744
+     div_dum |  -.0211091     .00454    -4.65   0.000    -.0300073   -.0122109
+      aqc_at |  -.2654179   .0219974   -12.07   0.000    -.3085319   -.2223038
+         nei |   .1444359   .0145425     9.93   0.000      .115933    .1729388
+         ndi |   .1660942   .0157621    10.54   0.000     .1352012    .1969873
+      neg_ni |  -.0013686   .0035782    -0.38   0.702    -.0083817    .0056445
+         tb3 |  -.0007475   .0005338    -1.40   0.161    -.0017938    .0002987
+creditspread |   .0017026   .0041859     0.41   0.684    -.0065016    .0099068
+        ipo1 |   .0312858   .0047509     6.59   0.000     .0219742    .0405975
+        ipo2 |   .0125313   .0046341     2.70   0.007     .0034486     .021614
+        ipo3 |   .0013753   .0045018     0.31   0.760    -.0074482    .0101987
+        ipo4 |  -.0018311   .0040884    -0.45   0.654    -.0098443    .0061821
+        ipo5 |  -.0038483   .0028448    -1.35   0.176    -.0094241    .0017275
+------------------------------------------------------------------------------
+
+. eststo est4
+
+. estadd local r2_ "`r2_'"
+
+added macro:
+                e(r2_) : "0.479"
+
+. 
+. ereturn post b2 V2
+
+. ereturn display
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   Intercept |  -.1013644   .0129559    -7.82   0.000    -.1267574   -.0759714
+   ind_cfvol |   .7626907   .1038619     7.34   0.000     .5591251    .9662563
+         mtb |    .008621   .0018748     4.60   0.000     .0049465    .0122955
+        size |   .0055969   .0012157     4.60   0.000     .0032142    .0079796
+         ocf |  -.0093327   .0175697    -0.53   0.595    -.0437686    .0251032
+         nwc |    .009629   .0144129     0.67   0.504    -.0186199    .0378778
+     capx_at |  -.0725082   .0293891    -2.47   0.014    -.1301098   -.0149067
+         lev |   -.005152   .0141824    -0.36   0.716    -.0329489     .022645
+          rd |   .0028014   .0048009     0.58   0.560    -.0066082    .0122109
+     div_dum |   -.017177   .0050218    -3.42   0.001    -.0270195   -.0073344
+      aqc_at |  -.1060387   .0188834    -5.62   0.000    -.1430495   -.0690278
+------------------------------------------------------------------------------
+
+. eststo est5
+
+. 
+. ereturn post b3 V3
+
+. ereturn display
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   Intercept |    .013243   .0144762     0.91   0.360    -.0151298    .0416158
+   ind_cfvol |   .0102114    .098677     0.10   0.918    -.1831921    .2036149
+         mtb |   .0020174    .003368     0.60   0.549    -.0045837    .0086185
+        size |    .001718   .0022038     0.78   0.436    -.0026015    .0060375
+         ocf |  -.0408129   .0211931    -1.93   0.054    -.0823506    .0007247
+         nwc |  -.0345644   .0197815    -1.75   0.081    -.0733354    .0042066
+     capx_at |  -.1370874   .0577453    -2.37   0.018    -.2502662   -.0239087
+         lev |  -.0048939   .0195032    -0.25   0.802    -.0431195    .0333318
+          rd |   .0005202   .0032875     0.16   0.874    -.0059231    .0069636
+     div_dum |  -.0153762   .0065517    -2.35   0.019    -.0282172   -.0025352
+      aqc_at |   -.095448   .0300543    -3.18   0.001    -.1543535   -.0365426
+------------------------------------------------------------------------------
+
+. eststo est6
+
+. 
+. * Model 3
+. gen logcashr = log(che / (at - che))
+(1,303 missing values generated)
+
+. 
+. global control1 = "c.ind_cfvol c.mtb c.size c.ocf c.nwc c.capx_at c.lev c.rd 
+> i.div_dum c.aqc_at"
+
+. global control2 = "nei ndi neg_ni tb3 creditspread ipo1 ipo2 ipo3 ipo4 ipo5"
+
+. 
+. qui reghdfe logcashr ($control1 )##i.dum1990##i.dum2000 $control2, noabsorb c
+> l(gvkey fyear)
+
+. mat b = e(b)
+
+. mat V = e(V)
+
+. local r2_ : di %4.3f e(r2_a)
+
+. 
+. mata
+------------------------------------------------- mata (type end to exit) -----
+: b = st_matrix("b")
+
+: V = st_matrix("V")
+
+: V = V[selectindex(b :!= 0), selectindex(b :!= 0)]
+
+: b = b[1, selectindex(b :!= 0)]
+
+: 
+: b1 = b[1, (43, 1..10, 33..42)]
+
+: V1 = V[(43, 1..10, 33..42), (43, 1..10, 33..42)]
+
+: 
+: b2 = b[1, (11..21)]
+
+: V2 = V[(11..21), (11..21)]
+
+: 
+: b3 = b[1, (22..32)]
+
+: V3 = V[(22..32), (22..32)]
+
+: 
+: st_matrix("b1", b1)
+
+: st_matrix("b2", b2)
+
+: st_matrix("b3", b3)
+
+: 
+: st_matrix("V1", V1)
+
+: st_matrix("V2", V2)
+
+: st_matrix("V3", V3)
+
+: end
+-------------------------------------------------------------------------------
+
+. 
+. matrix colnames b1 = Intercept ind_cfvol mtb size ocf nwc capx_at lev rd div_
+> dum aqc_at $control2
+
+. matrix rownames V1 = Intercept ind_cfvol mtb size ocf nwc capx_at lev rd div_
+> dum aqc_at $control2
+
+. matrix colnames V1 = Intercept ind_cfvol mtb size ocf nwc capx_at lev rd div_
+> dum aqc_at $control2
+
+. 
+. forvalues i = 2/3 {
+  2.         matrix colnames b`i' = Intercept ind_cfvol mtb size ocf nwc capx_a
+> t lev rd div_dum aqc_at
+  3.         matrix rownames V`i' = Intercept ind_cfvol mtb size ocf nwc capx_a
+> t lev rd div_dum aqc_at
+  4.         matrix colnames V`i' = Intercept ind_cfvol mtb size ocf nwc capx_a
+> t lev rd div_dum aqc_at
+  5. }
+
+. 
+. ereturn post b1 V1
+
+. ereturn display
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   Intercept |  -1.071713   .1367299    -7.84   0.000    -1.339699   -.8037275
+   ind_cfvol |   1.335332   .7122737     1.87   0.061    -.0606988    2.731363
+         mtb |   .0670808   .0093488     7.18   0.000     .0487574    .0854041
+        size |  -.0622424    .011325    -5.50   0.000     -.084439   -.0400458
+         ocf |   .6261022    .124974     5.01   0.000     .3811576    .8710467
+         nwc |  -2.148956   .1008019   -21.32   0.000    -2.346524   -1.951388
+     capx_at |  -2.941512   .1868625   -15.74   0.000    -3.307756   -2.575269
+         lev |  -3.653006    .096566   -37.83   0.000    -3.842272   -3.463741
+          rd |   .2855236   .0275773    10.35   0.000     .2314731    .3395742
+     div_dum |   -.196955   .0558026    -3.53   0.000     -.306326    -.087584
+      aqc_at |  -1.613856   .2032129    -7.94   0.000    -2.012146   -1.215566
+         nei |   .9022658     .08802    10.25   0.000     .7297498    1.074782
+         ndi |   1.282404   .1198629    10.70   0.000     1.047477    1.517331
+      neg_ni |  -.0804644   .0401055    -2.01   0.045    -.1590697   -.0018592
+         tb3 |  -.0131429   .0077361    -1.70   0.089    -.0283054    .0020196
+creditspread |   .1324183   .0671769     1.97   0.049      .000754    .2640826
+        ipo1 |   .1520027   .0426115     3.57   0.000     .0684857    .2355197
+        ipo2 |   .0082905    .042134     0.20   0.844    -.0742905    .0908716
+        ipo3 |  -.0582316   .0401055    -1.45   0.147    -.1368368    .0203737
+        ipo4 |  -.0614634   .0353248    -1.74   0.082    -.1306987    .0077719
+        ipo5 |  -.0839294   .0319869    -2.62   0.009    -.1466225   -.0212363
+------------------------------------------------------------------------------
+
+. eststo est7
+
+. estadd local r2_ "`r2_'"
+
+added macro:
+                e(r2_) : "0.391"
+
+. 
+. ereturn post b2 V2
+
+. ereturn display
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   Intercept |  -.7266876   .1089454    -6.67   0.000    -.9402166   -.5131586
+   ind_cfvol |   7.088739   .9209249     7.70   0.000     5.283759    8.893718
+         mtb |    .055645   .0130343     4.27   0.000     .0300982    .0811919
+        size |     .00769   .0129681     0.59   0.553     -.017727     .033107
+         ocf |  -.1009071   .1512388    -0.67   0.505    -.3973298    .1955156
+         nwc |  -.1127625   .1432855    -0.79   0.431     -.393597    .1680719
+     capx_at |  -.4576453   .2112492    -2.17   0.030    -.8716861   -.0436044
+         lev |  -.2266841   .1129657    -2.01   0.045    -.4480928   -.0052755
+          rd |  -.0076123    .028402    -0.27   0.789    -.0632792    .0480547
+     div_dum |  -.1694235   .0615755    -2.75   0.006    -.2901093   -.0487378
+      aqc_at |    -1.2519   .2176421    -5.75   0.000    -1.678471   -.8253296
+------------------------------------------------------------------------------
+
+. eststo est8
+
+. 
+. ereturn post b3 V3
+
+. ereturn display
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   Intercept |  -.2241558   .1189418    -1.88   0.059    -.4572775    .0089659
+   ind_cfvol |  -.3451862   .8310799    -0.42   0.678    -1.974073    1.283701
+         mtb |    .036745   .0229925     1.60   0.110    -.0083195    .0818096
+        size |   .0521061   .0161064     3.24   0.001     .0205381    .0836741
+         ocf |  -.3616778   .1778074    -2.03   0.042     -.710174   -.0131816
+         nwc |   .0150434   .1792805     0.08   0.933    -.3363399    .3664267
+     capx_at |  -1.221083   .6688704    -1.83   0.068    -2.532045    .0898786
+         lev |   .3812921   .1973597     1.93   0.053    -.0055258    .7681101
+          rd |   .0109414   .0231668     0.47   0.637    -.0344646    .0563474
+     div_dum |  -.0743804   .0599432    -1.24   0.215    -.1918669     .043106
+      aqc_at |   -.753798   .3323643    -2.27   0.023     -1.40522    -.102376
+------------------------------------------------------------------------------
+
+. eststo est9
+
+. 
+. * Tabulate
+. esttab est1 est2 est3 est4 est5 est6 est7 est8 est9 using "analysis/output/ta
+> b/tab3b.tex", replace stats(r2_, label("Adjusted $ R^{2}$")) p nostar nonotes
+>  msign("$-$") label booktab longtable nonumbers nomtitles ///
+> b(3) p(3) ///
+> posthead("\multicolumn{10}{c}{Panel B} \\" ///
+>  "\midrule \multicolumn{1}{p{1.5cm}}{Model} & \multicolumn{3}{c}{Cash/Assets}
+>  & \multicolumn{3}{c}{Cash/Assets}  & \multicolumn{3}{c}{Log (Cash/Net Assets
+> )} \\" "\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}" ///
+> "\multicolumn{1}{p{1.5cm}}{Dependent Variables} & \multicolumn{1}{p{1.8cm}}{\
+> centering Estimate} & \multicolumn{1}{p{1.8cm}}{\centering Interaction \\1990
+> s} & \multicolumn{1}{p{1.8cm}}{\centering Interaction \\2000s} & \multicolumn
+> {1}{p{1.8cm}}{\centering Estimate} & \multicolumn{1}{p{1.8cm}}{\centering Int
+> eraction \\1990s} & \multicolumn{1}{p{1.8cm}}{\centering Interaction \\2000s}
+>  & \multicolumn{1}{p{1.8cm}}{\centering Estimate} & \multicolumn{1}{p{1.8cm}}
+> {\centering Interaction \\1990s} & \multicolumn{1}{p{1.8cm}}{\centering Inter
+> action \\2000s} \\" "\midrule") ///
+> prefoot("\\")
+(output written to analysis/output/tab/tab3b.tex)
+
+. 
+end of do-file

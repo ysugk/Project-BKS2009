@@ -1,0 +1,386 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   16.1   Copyright 1985-2019 StataCorp LLC
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     Special Edition                  College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+Single-user Stata license expires  5 Jul 2021:
+       Serial number:  401609700731
+         Licensed to:  Yongseok Kim
+                       Indiana University Bloomington
+
+Notes:
+      1.  Stata is running in batch mode.
+      2.  Unicode is supported; see help unicode_advice.
+      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+
+. do tabulate_tab5 
+
+. clear all
+
+. set more off
+
+. 
+. cd ~/Projects/Replication/BKS2009
+/Users/apple/Projects/Replication/BKS2009
+
+. use analysis/temp/prepared, replace
+
+. 
+. * Same winsorizing
+. replace lev = 1 if lev > 1
+(1,770 real changes made)
+
+. replace lev = 0 if lev < 0
+(0 real changes made)
+
+. winsor2 rd aqc_at capx_at, c(1 99) replace
+
+. winsor2 nwc ocf, c(1 100) replace
+
+. winsor2 mtb, c(0 99) replace
+
+. 
+. winsor2 cfvol, c(1 99) replace
+
+. 
+. * Generate industry sigma
+. preserve
+
+. collapse (mean) ind_cfvol = cfvol, by(fyear sic2)
+
+. la var ind_cfvol "Industry sigma"
+
+. tempfile ind_cfvol
+
+. save `ind_cfvol'
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St42672.000002 saved
+
+. restore
+
+. 
+. merge m:1 fyear sic2 using `ind_cfvol'
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                           116,655  (_merge==3)
+    -----------------------------------------
+
+. 
+. gen treat = .
+(116,655 missing values generated)
+
+. replace treat = 0 if fyear >= 1980 & fyear <= 1989
+(40,491 real changes made)
+
+. replace treat = 1 if fyear >= 2000 & fyear <= 2006
+(27,438 real changes made)
+
+. 
+. drop if missing(treat)
+(48,726 observations deleted)
+
+. 
+. * Calculate predicted cash ratio
+. gen pcashr = 0.307 + 0.230 * ind_cfvol + 0.006 * mtb - 0.009 * size + 0.077 *
+>  ocf - 0.238 * nwc - 0.372 * capx_at - 0.360 * lev + 0.048 * rd - 0.024 * div
+> _dum - 0.233 * aqc_at + 0.158 * nei + 0.190 * ndi
+(17,242 missing values generated)
+
+. 
+. mat scaler = (0.230, 0.006, -0.009, 0.077, -0.238, -0.372, -0.360, 0.048, -0.
+> 024, -0.233, 0.158, 0.190)
+
+. 
+. * Whole sample
+. foreach v in ind_cfvol mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi
+>  {
+  2.         qui ttest `v', by(treat)
+  3.         matrix mat_`v' = (r(mu_2) - r(mu_1), r(se))
+  4. }
+
+. 
+. mat temp = mat_ind_cfvol
+
+. 
+. foreach v in mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi {
+  2.         mat temp = temp \ mat_`v'
+  3. }
+
+. 
+. forvalue i = 1/12 {
+  2.         mat temp[`i', 1] = temp[`i', 1] * scaler[1, `i']
+  3.         mat temp[`i', 2] = (temp[`i', 2] * scaler[1, `i'])^2
+  4. }
+
+. 
+. mata
+------------------------------------------------- mata (type end to exit) -----
+: temp = st_matrix("temp")
+
+: b = temp[1..12, 1]'
+
+: V = diag(temp[1..12, 2])
+
+: 
+: st_matrix("b", b)
+
+: st_matrix("V", V)
+
+: end
+-------------------------------------------------------------------------------
+
+. 
+. mat coln b = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi
+
+. mat rown V = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi
+
+. mat coln V = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi
+
+. 
+. ereturn post b V
+
+. eststo whole
+
+. 
+. * Non-dividend
+. 
+. foreach v in ind_cfvol mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi
+>  {
+  2.         qui ttest `v' if div_dum == 0, by(treat)
+  3.         matrix mat_`v' = (r(mu_2) - r(mu_1), r(se))
+  4. }
+
+. 
+. mat temp1 = mat_ind_cfvol
+
+. 
+. foreach v in mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi {
+  2.         mat temp1 = temp1 \ mat_`v'
+  3. }
+
+. 
+. forvalue i = 1/12 {
+  2.         mat temp1[`i', 1] = temp1[`i', 1] * scaler[1, `i']
+  3.         mat temp1[`i', 2] = (temp1[`i', 2] * scaler[1, `i'])^2
+  4. }
+
+. 
+. * Dividend
+. 
+. foreach v in ind_cfvol mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi
+>  {
+  2.         qui ttest `v' if div_dum == 1, by(treat)
+  3.         matrix mat_`v' = (r(mu_2) - r(mu_1), r(se))
+  4. }
+
+. 
+. mat temp2 = mat_ind_cfvol
+
+. 
+. foreach v in mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi {
+  2.         mat temp2 = temp2 \ mat_`v'
+  3. }
+
+. 
+. forvalue i = 1/12 {
+  2.         mat temp2[`i', 1] = temp2[`i', 1] * scaler[1, `i']
+  3.         mat temp2[`i', 2] = (temp2[`i', 2] * scaler[1, `i'])^2
+  4. }
+
+. 
+. mata
+------------------------------------------------- mata (type end to exit) -----
+: temp1 = st_matrix("temp1")
+
+: temp2 = st_matrix("temp2")
+
+: 
+: b1 = temp1[1..12, 1]'
+
+: V1 = diag(temp1[1..12, 2])
+
+: 
+: b2 = temp2[1..12, 1]'
+
+: V2 = diag(temp2[1..12, 2])
+
+: 
+: b3 = b1 - b2
+
+: 
+: st_matrix("b1", b1)
+
+: st_matrix("V1", V1)
+
+: 
+: st_matrix("b2", b2)
+
+: st_matrix("V2", V2)
+
+: 
+: st_matrix("b3", b3)
+
+: end
+-------------------------------------------------------------------------------
+
+. 
+. forvalue i = 1/2 {
+  2.         mat coln b`i' = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum 
+> aqc_at nei ndi
+  3.         mat rown V`i' = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum 
+> aqc_at nei ndi
+  4.         mat coln V`i' = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum 
+> aqc_at nei ndi
+  5. }
+
+. 
+. mat coln b3 = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum aqc_at nei nd
+> i
+
+. 
+. ereturn post b1 V1
+
+. eststo nondiv
+
+. 
+. ereturn post b2 V2
+
+. eststo div
+
+. 
+. ereturn post b3
+
+. eststo divdiff
+
+. 
+. * Non-S&P 500
+. 
+. foreach v in ind_cfvol mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi
+>  {
+  2.         qui ttest `v' if sp500 == 0, by(treat)
+  3.         matrix mat_`v' = (r(mu_2) - r(mu_1), r(se))
+  4. }
+
+. 
+. mat temp1 = mat_ind_cfvol
+
+. 
+. foreach v in mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi {
+  2.         mat temp1 = temp1 \ mat_`v'
+  3. }
+
+. 
+. forvalue i = 1/12 {
+  2.         mat temp1[`i', 1] = temp1[`i', 1] * scaler[1, `i']
+  3.         mat temp1[`i', 2] = (temp1[`i', 2] * scaler[1, `i'])^2
+  4. }
+
+. 
+. * S&P 500
+. 
+. foreach v in ind_cfvol mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi
+>  {
+  2.         qui ttest `v' if sp500 == 1, by(treat)
+  3.         matrix mat_`v' = (r(mu_2) - r(mu_1), r(se))
+  4. }
+
+. 
+. mat temp2 = mat_ind_cfvol
+
+. 
+. foreach v in mtb size ocf nwc capx_at lev rd div_dum aqc_at nei ndi {
+  2.         mat temp2 = temp2 \ mat_`v'
+  3. }
+
+. 
+. forvalue i = 1/12 {
+  2.         mat temp2[`i', 1] = temp2[`i', 1] * scaler[1, `i']
+  3.         mat temp2[`i', 2] = (temp2[`i', 2] * scaler[1, `i'])^2
+  4. }
+
+. 
+. mata
+------------------------------------------------- mata (type end to exit) -----
+: temp1 = st_matrix("temp1")
+
+: temp2 = st_matrix("temp2")
+
+: 
+: b1 = temp1[1..12, 1]'
+
+: V1 = diag(temp1[1..12, 2])
+
+: 
+: b2 = temp2[1..12, 1]'
+
+: V2 = diag(temp2[1..12, 2])
+
+: 
+: b3 = b1 - b2
+
+: 
+: st_matrix("b1", b1)
+
+: st_matrix("V1", V1)
+
+: 
+: st_matrix("b2", b2)
+
+: st_matrix("V2", V2)
+
+: 
+: st_matrix("b3", b3)
+
+: end
+-------------------------------------------------------------------------------
+
+. 
+. forvalue i = 1/2 {
+  2.         mat coln b`i' = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum 
+> aqc_at nei ndi
+  3.         mat rown V`i' = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum 
+> aqc_at nei ndi
+  4.         mat coln V`i' = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum 
+> aqc_at nei ndi
+  5. }
+
+. 
+. mat coln b3 = ind_cfvol mtb size ocf nwc capx_at lev rd div_dum aqc_at nei nd
+> i
+
+. 
+. ereturn post b1 V1
+
+. eststo nonsp
+
+. 
+. ereturn post b2 V2
+
+. eststo sp
+
+. 
+. ereturn post b3
+
+. eststo spdiff
+
+. 
+. * Tabulate
+. 
+. esttab whole nondiv div divdiff nonsp sp spdiff using "analysis/output/tab/ta
+> b5.tex", replace booktabs nomtitles nonumbers msign("$-$") nostar nonotes noo
+> bs b(3) se(4) label ////
+> mgroups("Whole Sample" "Nondividend Paying Firms" "Dividend Paying Firms" "Di
+> fference" "Non-S\&P 500 Firms" "S\&P 500 Firms" "Difference", ///
+> pattern(1 1 1 1 1 1 1) ///
+> prefix("\multicolumn{@span}{p{2cm}}{\centering ") suffix("}"))
+(output written to analysis/output/tab/tab5.tex)
+
+. 
+end of do-file
