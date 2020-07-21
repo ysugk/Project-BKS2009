@@ -2,22 +2,22 @@
   ___  ____  ____  ____  ____ (R)
  /__    /   ____/   /   ____/
 ___/   /   /___/   /   /___/   16.1   Copyright 1985-2019 StataCorp LLC
-  Statistics/Data Analysis            StataCorp
+  Statistics/Data analysis            StataCorp
                                       4905 Lakeway Drive
      Special Edition                  College Station, Texas 77845 USA
-                                      800-STATA-PC        http://www.stata.com
+                                      800-STATA-PC        https://www.stata.com
                                       979-696-4600        stata@stata.com
                                       979-696-4601 (fax)
 
-Single-user Stata license expires  5 Jul 2021:
-       Serial number:  401609700731
-         Licensed to:  Yongseok Kim
-                       Indiana University Bloomington
+Stata license: Single-user , expiring  5 Jul 2021
+Serial number: 401609700731
+  Licensed to: Yongseok Kim
+               Indiana University Bloomington
 
 Notes:
-      1.  Stata is running in batch mode.
-      2.  Unicode is supported; see help unicode_advice.
-      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000; see help set_maxvar.
 
 . do tabulate_tab3a 
 
@@ -40,7 +40,7 @@ Notes:
 . 
 . * Same winsorizing
 . replace lev = 1 if lev > 1
-(1,770 real changes made)
+(15,675 real changes made)
 
 . replace lev = 0 if lev < 0
 (0 real changes made)
@@ -66,7 +66,7 @@ Notes:
 . tempfile ind_cfvol
 
 . save `ind_cfvol'
-file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St42664.000002 saved
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St70548.000002 saved
 
 . restore
 
@@ -76,7 +76,7 @@ file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St42664.000002 saved
     Result                           # of obs.
     -----------------------------------------
     not matched                             0
-    matched                           116,655  (_merge==3)
+    matched                           143,675  (_merge==3)
     -----------------------------------------
 
 . 
@@ -93,7 +93,7 @@ file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St42664.000002 saved
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.454"
+                e(r2_) : "0.456"
 
 . estadd local yearfixed ""
 
@@ -103,7 +103,7 @@ added macro:
 . 
 . * Column 2
 . gen log_cashr = log(che/(at - che))
-(1,303 missing values generated)
+(15,198 missing values generated)
 
 . la var log_cashr "log cash over net assets"
 
@@ -117,7 +117,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.370"
+                e(r2_) : "0.369"
 
 . estadd local yearfixed ""
 
@@ -133,15 +133,15 @@ added macro:
 
 . 
 . gen lag_cash = L.cashr
-(14,334 missing values generated)
+(30,973 missing values generated)
 
 . la var lag_cash "Lag cash"
 
 . gen dcashr = D.cashr
-(14,507 missing values generated)
+(31,186 missing values generated)
 
 . gen lag_dcashr = L.dcashr
-(27,015 missing values generated)
+(46,039 missing values generated)
 
 . la var lag_dcashr "Lag dcash"
 
@@ -155,7 +155,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.237"
+                e(r2_) : "0.235"
 
 . estadd local yearfixed ""
 
@@ -167,14 +167,14 @@ added macro:
 . gen dum1990 = 0
 
 . replace dum1990 = 1 if inrange(fyear, 1990, 1999)
-(48,726 real changes made)
+(59,678 real changes made)
 
 . la var dum1990 "1990s dummy"
 
 . gen dum2000 = 0
 
 . replace dum2000 = 1 if fyear >= 2000
-(27,438 real changes made)
+(34,654 real changes made)
 
 . la var dum2000 "2000s dummy"
 
@@ -188,7 +188,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.457"
+                e(r2_) : "0.459"
 
 . estadd local yearfixed ""
 
@@ -225,7 +225,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.238"
+                e(r2_) : "0.236"
 
 . estadd local yearfixed ""
 
@@ -243,7 +243,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.354"
+                e(r2_) : "0.356"
 
 . estadd local yearfixed ""
 
@@ -261,7 +261,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.488"
+                e(r2_) : "0.492"
 
 . estadd local yearfixed ""
 
@@ -280,7 +280,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.418"
+                e(r2_) : "0.421"
 
 . estadd local yearfixed "Yes"
 
@@ -292,7 +292,7 @@ added macro:
 . esttab using "analysis/output/tab/tab3a.tex", replace p nostar order(_cons la
 > g_dcashr lag_cash) label booktabs longtable b(3) p(3) nonotes constant msign(
 > "$-$") nomtitles nonumbers title("Regressions Estimating the Determinants of 
-> Cash Holdings") ///
+> Cash Holdings \label{tab:3}") ///
 > posthead("\multicolumn{10}{c}{Panel A} \\" ///
 > "\midrule Model & OLS & OLS & Changes & OLS & OLS & Changes & F-M (1980s) & F
 > -M (1990s) & FE \\" ///

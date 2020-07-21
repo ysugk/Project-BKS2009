@@ -86,7 +86,7 @@ data <- idxcst_his %>%
 write_rds(data, "build/input/wrds/idxcst_his.rds", compress = "gz")
 
 # download funda -----
-select_condition <- c("gvkey", "datadate", "indfmt", "datafmt", "popsrc", "consol", "curcd", "costat",
+select_condition <- c("gvkey", "datadate", "indfmt", "datafmt", "popsrc", "consol", "curcd", "costat", "sich",
            "fyear", "tic", "cusip", "fyr", "che", "dlc", "dltt", "at", "oibdp", "txt", "xint", "dvp", 
            "dvc", "prcc_f", "cshpri", "pstkl", "txditc", "invt", "ppent", "pi", "sale", 
            "re", "act", "lct", "csho", "ajex", "ni", "capx", "xrd", "aqc", "wcap", "ceq", "ebitda",

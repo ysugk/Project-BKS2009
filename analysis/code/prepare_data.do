@@ -10,6 +10,8 @@ save analysis/input/data, replace
 destring gvkey, replace
 destring sic, replace
 
+replace sic = sich
+
 duplicates drop gvkey fyear, force
 tsset gvkey fyear
 

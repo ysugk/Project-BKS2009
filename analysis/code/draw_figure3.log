@@ -2,22 +2,22 @@
   ___  ____  ____  ____  ____ (R)
  /__    /   ____/   /   ____/
 ___/   /   /___/   /   /___/   16.1   Copyright 1985-2019 StataCorp LLC
-  Statistics/Data Analysis            StataCorp
+  Statistics/Data analysis            StataCorp
                                       4905 Lakeway Drive
      Special Edition                  College Station, Texas 77845 USA
-                                      800-STATA-PC        http://www.stata.com
+                                      800-STATA-PC        https://www.stata.com
                                       979-696-4600        stata@stata.com
                                       979-696-4601 (fax)
 
-Single-user Stata license expires  5 Jul 2021:
-       Serial number:  401609700731
-         Licensed to:  Yongseok Kim
-                       Indiana University Bloomington
+Stata license: Single-user , expiring  5 Jul 2021
+Serial number: 401609700731
+  Licensed to: Yongseok Kim
+               Indiana University Bloomington
 
 Notes:
-      1.  Stata is running in batch mode.
-      2.  Unicode is supported; see help unicode_advice.
-      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000; see help set_maxvar.
 
 . do draw_figure3 
 
@@ -35,41 +35,41 @@ Notes:
 
 . 
 . keep if fyear - year(ipodate2) >= 5
-(41,269 observations deleted)
+(52,474 observations deleted)
 
 . 
 . gen ipocohort = .
-(75,386 missing values generated)
+(91,201 missing values generated)
 
 . replace ipocohort = 1960 if ipodate2 <= mdy(12, 31, 1969)
-(17,237 real changes made)
+(18,733 real changes made)
 
 . replace ipocohort = 1970 if mdy(1, 1, 1970) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1974)
-(18,260 real changes made)
+(22,518 real changes made)
 
 . replace ipocohort = 1975 if mdy(1, 1, 1975) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1979)
-(4,732 real changes made)
+(5,275 real changes made)
 
 . replace ipocohort = 1980 if mdy(1, 1, 1980) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1984)
-(11,155 real changes made)
+(12,455 real changes made)
 
 . replace ipocohort = 1985 if mdy(1, 1, 1985) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1989)
-(9,771 real changes made)
+(13,748 real changes made)
 
 . replace ipocohort = 1990 if mdy(1, 1, 1990) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1994)
-(8,583 real changes made)
+(11,708 real changes made)
 
 . replace ipocohort = 1995 if mdy(1, 1, 1995) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1999)
-(5,158 real changes made)
+(6,103 real changes made)
 
 . replace ipocohort = 2000 if mdy(1, 1, 2000) <= ipodate2 & ipodate2 < .
-(490 real changes made)
+(661 real changes made)
 
 . 
 . collapse (count) nobs = cashr (mean) mean_cashr = cashr, by(fyear ipocohort)
