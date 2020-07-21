@@ -2,22 +2,22 @@
   ___  ____  ____  ____  ____ (R)
  /__    /   ____/   /   ____/
 ___/   /   /___/   /   /___/   16.1   Copyright 1985-2019 StataCorp LLC
-  Statistics/Data Analysis            StataCorp
+  Statistics/Data analysis            StataCorp
                                       4905 Lakeway Drive
      Special Edition                  College Station, Texas 77845 USA
-                                      800-STATA-PC        http://www.stata.com
+                                      800-STATA-PC        https://www.stata.com
                                       979-696-4600        stata@stata.com
                                       979-696-4601 (fax)
 
-Single-user Stata license expires  5 Jul 2021:
-       Serial number:  401609700731
-         Licensed to:  Yongseok Kim
-                       Indiana University Bloomington
+Stata license: Single-user , expiring  5 Jul 2021
+Serial number: 401609700731
+  Licensed to: Yongseok Kim
+               Indiana University Bloomington
 
 Notes:
-      1.  Stata is running in batch mode.
-      2.  Unicode is supported; see help unicode_advice.
-      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000; see help set_maxvar.
 
 . do tabulate_tab2 
 
@@ -54,7 +54,7 @@ xij variables:
 . tempfile byni
 
 . save `byni'
-file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St42663.000002 saved
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69695.000002 saved
 
 . restore
 
@@ -81,7 +81,7 @@ xij variables:
 . tempfile bydiv
 
 . save `bydiv'
-file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St42663.000004 saved
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69695.000004 saved
 
 . restore
 
@@ -89,16 +89,17 @@ file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St42663.000004 saved
 . gen ipo_dum = .
 (116,655 missing values generated)
 
-. replace ipo_dum = 1 if fromipo <= 365 * 5
-(41,670 real changes made)
+. replace ipo_dum = 1 if cyear - year(ipodate2) >= 0 & cyear - year(ipodate2) <
+> = 5
+(45,927 real changes made)
 
-. replace ipo_dum = 0 if fromipo > 365 * 5
-(74,985 real changes made)
+. replace ipo_dum = 0 if cyear - year(ipodate2) > 5
+(70,634 real changes made)
 
 . collapse (mean) byipo_cashr = cashr, by(fyear ipo_dum)
 
 . drop if missing(ipo_dum)
-(0 observations deleted)
+(27 observations deleted)
 
 . reshape wide byipo_cashr, i(fyear) j(ipo_dum)
 (note: j = 0 1)

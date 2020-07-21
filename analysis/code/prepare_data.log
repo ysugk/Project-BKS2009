@@ -2,22 +2,22 @@
   ___  ____  ____  ____  ____ (R)
  /__    /   ____/   /   ____/
 ___/   /   /___/   /   /___/   16.1   Copyright 1985-2019 StataCorp LLC
-  Statistics/Data Analysis            StataCorp
+  Statistics/Data analysis            StataCorp
                                       4905 Lakeway Drive
      Special Edition                  College Station, Texas 77845 USA
-                                      800-STATA-PC        http://www.stata.com
+                                      800-STATA-PC        https://www.stata.com
                                       979-696-4600        stata@stata.com
                                       979-696-4601 (fax)
 
-Single-user Stata license expires  5 Jul 2021:
-       Serial number:  401609700731
-         Licensed to:  Yongseok Kim
-                       Indiana University Bloomington
+Stata license: Single-user , expiring  5 Jul 2021
+Serial number: 401609700731
+  Licensed to: Yongseok Kim
+               Indiana University Bloomington
 
 Notes:
-      1.  Stata is running in batch mode.
-      2.  Unicode is supported; see help unicode_advice.
-      3.  Maximum number of variables is set to 5000; see help set_maxvar.
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000; see help set_maxvar.
 
 . do prepare_data 
 
@@ -44,208 +44,9 @@ gvkey: all characters numeric; replaced as long
 sic already numeric; no replace
 
 . 
-. duplicates drop gvkey fyear, force
+. replace sic = sich
+sich not found
+r(111);
 
-Duplicates in terms of gvkey fyear
-
-(0 observations are duplicates)
-
-. tsset gvkey fyear
-       panel variable:  gvkey (unbalanced)
-        time variable:  fyear, 1960 to 2011, but with gaps
-                delta:  1 unit
-
-. 
-. * Generate industry codes
-. gen sic2 = int(sic/100)
-
-. gen sic1 = .
-(263,542 missing values generated)
-
-. replace sic1 = 1 if sic2>=1 & sic2<=9
-(847 real changes made)
-
-. replace sic1 = 2 if sic2>=10 & sic2<=14
-(13,665 real changes made)
-
-. replace sic1 = 3 if sic2>=15 & sic2<=17
-(2,909 real changes made)
-
-. replace sic1 = 4 if sic2>=20 & sic2<=39
-(102,757 real changes made)
-
-. replace sic1 = 5 if sic2>=40 & sic2<=49
-(22,778 real changes made)
-
-. replace sic1 = 6 if sic2>=50 & sic2<=51
-(8,839 real changes made)
-
-. replace sic1 = 7 if sic2>=52 & sic2<=59
-(15,229 real changes made)
-
-. replace sic1 = 8 if sic2>=70 & sic2<=89
-(32,513 real changes made)
-
-. 
-. * Basic filter
-. keep if at > 0
-(23 observations deleted)
-
-. keep if sale > 0
-(2,911 observations deleted)
-
-. keep if fic == "USA"
-(19,388 observations deleted)
-
-. 
-. * Define variables
-. gen lag1_at = L.at
-(41,681 missing values generated)
-
-. la var lag1_at "lag 1 total assets"
-
-. gen dt = dlc + dltt
-(24,338 missing values generated)
-
-. la var dt "toal debt"
-
-. gen lev = dt/at
-(24,338 missing values generated)
-
-. la var lev "Leverage"
-
-. gen cashr = che/at
-(23,478 missing values generated)
-
-. la var cashr "cash ratio"
-
-. gen div_dum = .
-(241,220 missing values generated)
-
-. replace div_dum = 1 if dvc > 0
-(123,609 real changes made)
-
-. replace div_dum = 0 if dvc == 0
-(117,604 real changes made)
-
-. la var div_dum "Dividend dummy"
-
-. gen neg_ni = ni < 0
-
-. la var neg_ni "negative net income"
-
-. gen mve = prcc_f * cshpri
-(28,167 missing values generated)
-
-. la var mve "market value of equity"
-
-. gen mtb = (at - ceq + mve)/at
-(30,284 missing values generated)
-
-. la var mtb "Market to book"
-
-. gen size = log(at / (gdpdeflator/100))
-(21,407 missing values generated)
-
-. la var size "Real size"
-
-. gen ocf = (oibdp - xint - txt - dvc)/at
-(52,922 missing values generated)
-
-. la var ocf "Cash flow/ assets"
-
-. gen nwc = (wcap - che)/at
-(58,772 missing values generated)
-
-. la var nwc "NWC/ assets"
-
-. gen capx_at = capx/at
-(40,612 missing values generated)
-
-. la var capx_at "Capex"
-
-. replace xrd = 0 if missing(xrd)
-(139,754 real changes made)
-
-. gen rd = xrd/sale
-(22,418 missing values generated)
-
-. la var rd "R\&D/ sales"
-
-. gen aqc_at = aqc/at
-(60,888 missing values generated)
-
-. la var aqc_at "Acquisition activity"
-
-. gen ndi = (dltis - dltr)/at
-(61,194 missing values generated)
-
-. la var ndi "Net debt issuance"
-
-. gen nei = (sstk - prstkc)/at
-(64,570 missing values generated)
-
-. la var nei "Net equity issuance"
-
-. gen ipodate2 = FR_ipodate
-(232,304 missing values generated)
-
-. replace ipodate2 = begdat if missing(ipodate2)
-(232,304 real changes made)
-
-. la var ipodate2 "ipo date"
-
-. gen fromipo = datadate - ipodate2
-
-. la var fromipo "days from ipo"
-
-. gen cyear = year(datadate)
-
-. la var cyear "calender year"
-
-. 
-. * Generate cash flow volatility
-. tsset gvkey fyear
-       panel variable:  gvkey (unbalanced)
-        time variable:  fyear, 1960 to 2011, but with gaps
-                delta:  1 unit
-
-. tsegen cfvol = rowsd(L(1/10).ocf, 3)
-(95015 missing values generated)
-
-. la var cfvol "cash flow volatility"
-
-. 
-. * Fill missing GIM index
-. replace gindex = gindex[_n - 1] if missing(gindex) & (gvkey == gvkey[_n - 1])
-(17,883 real changes made)
-
-. la var gindex "GIM index"
-
-. 
-. * Apply same filter
-. keep if fyear >= 1980 & fyear <= 2006
-(76,841 observations deleted)
-
-. 
-. * Drop financial firms
-. drop if sic >= 6000 & sic <= 6999
-(41,791 observations deleted)
-
-. * Drop utilities
-. drop if sic >= 4900 & sic <= 4999
-(5,933 observations deleted)
-
-. 
-. * Tidy data
-. keep gvkey cyear fyear datadate ipodate2 at lag1_at dt lev che cashr div_dum 
-> neg_ni mve mtb size ocf nwc capx_at rd aqc_at cfvol gindex ndi nei sp500 sic2
->  fromipo tb3 creditspread ib xint txditc xrd dvc
-
-. 
-. * Save data
-. save analysis/temp/prepared, replace
-file analysis/temp/prepared.dta saved
-
-. 
 end of do-file
+r(111);
