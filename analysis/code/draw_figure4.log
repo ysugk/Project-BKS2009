@@ -35,7 +35,7 @@ Notes:
 
 . 
 . drop if missing(gindex)
-(100,849 observations deleted)
+(101,144 observations deleted)
 
 . bysort fyear: egen gim_rank = rank(gindex)
 

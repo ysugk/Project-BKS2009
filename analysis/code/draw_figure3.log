@@ -35,38 +35,38 @@ Notes:
 
 . 
 . keep if fyear - year(ipodate2) >= 5
-(41,269 observations deleted)
+(41,350 observations deleted)
 
 . 
 . gen ipocohort = .
-(75,386 missing values generated)
+(75,616 missing values generated)
 
 . replace ipocohort = 1960 if ipodate2 <= mdy(12, 31, 1969)
-(17,237 real changes made)
+(17,277 real changes made)
 
 . replace ipocohort = 1970 if mdy(1, 1, 1970) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1974)
-(18,260 real changes made)
+(18,315 real changes made)
 
 . replace ipocohort = 1975 if mdy(1, 1, 1975) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1979)
-(4,732 real changes made)
+(4,672 real changes made)
 
 . replace ipocohort = 1980 if mdy(1, 1, 1980) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1984)
-(11,155 real changes made)
+(11,279 real changes made)
 
 . replace ipocohort = 1985 if mdy(1, 1, 1985) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1989)
-(9,771 real changes made)
+(9,768 real changes made)
 
 . replace ipocohort = 1990 if mdy(1, 1, 1990) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1994)
-(8,583 real changes made)
+(8,628 real changes made)
 
 . replace ipocohort = 1995 if mdy(1, 1, 1995) <= ipodate2 & ipodate2 <= mdy(12,
 >  31, 1999)
-(5,158 real changes made)
+(5,187 real changes made)
 
 . replace ipocohort = 2000 if mdy(1, 1, 2000) <= ipodate2 & ipodate2 < .
 (490 real changes made)

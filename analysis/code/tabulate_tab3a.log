@@ -40,7 +40,7 @@ Notes:
 . 
 . * Same winsorizing
 . replace lev = 1 if lev > 1
-(1,770 real changes made)
+(1,775 real changes made)
 
 . replace lev = 0 if lev < 0
 (0 real changes made)
@@ -66,7 +66,7 @@ Notes:
 . tempfile ind_cfvol
 
 . save `ind_cfvol'
-file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69697.000002 saved
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St70325.000002 saved
 
 . restore
 
@@ -76,7 +76,7 @@ file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69697.000002 saved
     Result                           # of obs.
     -----------------------------------------
     not matched                             0
-    matched                           116,655  (_merge==3)
+    matched                           116,966  (_merge==3)
     -----------------------------------------
 
 . 
@@ -103,7 +103,7 @@ added macro:
 . 
 . * Column 2
 . gen log_cashr = log(che/(at - che))
-(1,303 missing values generated)
+(1,311 missing values generated)
 
 . la var log_cashr "log cash over net assets"
 
@@ -117,7 +117,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.370"
+                e(r2_) : "0.369"
 
 . estadd local yearfixed ""
 
@@ -133,15 +133,15 @@ added macro:
 
 . 
 . gen lag_cash = L.cashr
-(14,334 missing values generated)
+(14,701 missing values generated)
 
 . la var lag_cash "Lag cash"
 
 . gen dcashr = D.cashr
-(14,507 missing values generated)
+(14,877 missing values generated)
 
 . gen lag_dcashr = L.dcashr
-(27,015 missing values generated)
+(27,632 missing values generated)
 
 . la var lag_dcashr "Lag dcash"
 
@@ -155,7 +155,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.237"
+                e(r2_) : "0.235"
 
 . estadd local yearfixed ""
 
@@ -167,14 +167,14 @@ added macro:
 . gen dum1990 = 0
 
 . replace dum1990 = 1 if inrange(fyear, 1990, 1999)
-(48,726 real changes made)
+(48,836 real changes made)
 
 . la var dum1990 "1990s dummy"
 
 . gen dum2000 = 0
 
 . replace dum2000 = 1 if fyear >= 2000
-(27,438 real changes made)
+(27,553 real changes made)
 
 . la var dum2000 "2000s dummy"
 
@@ -225,7 +225,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.238"
+                e(r2_) : "0.236"
 
 . estadd local yearfixed ""
 
@@ -243,7 +243,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.354"
+                e(r2_) : "0.353"
 
 . estadd local yearfixed ""
 
@@ -261,7 +261,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.488"
+                e(r2_) : "0.489"
 
 . estadd local yearfixed ""
 
@@ -280,7 +280,7 @@ added macro:
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.418"
+                e(r2_) : "0.417"
 
 . estadd local yearfixed "Yes"
 

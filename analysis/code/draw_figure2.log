@@ -40,7 +40,7 @@ Notes:
 . collapse (mean) ind_cfvol = cfvol, by (sic2 fyear)
 
 . keep if fyear == 1980 | fyear == 2006
-(1,530 observations deleted)
+(1,548 observations deleted)
 
 . tsset sic2 fyear
        panel variable:  sic2 (unbalanced)
@@ -49,10 +49,10 @@ Notes:
 
 . bysort sic2: gen Dind_cfvol = ind_cfvol - ind_cfvol[_n - 1] if sic2 == sic2[_
 > n - 1]
-(64 missing values generated)
+(65 missing values generated)
 
 . bysort sic2: keep if _n == _N
-(58 observations deleted)
+(59 observations deleted)
 
 . egen cfvol_group = cut(Dind_cfvol), group(5)
 (6 missing values generated)
@@ -62,7 +62,7 @@ Notes:
 . tempfile cfvol_group
 
 . save `cfvol_group'
-file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69681.000002 saved
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St70308.000002 saved
 
 . restore
 

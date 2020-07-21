@@ -35,14 +35,14 @@ Notes:
 . gen dum1990 = 0
 
 . replace dum1990 = 1 if fyear >= 1990
-(76,164 real changes made)
+(76,389 real changes made)
 
 . la var dum1990 "1990s dummy"
 
 . gen dum2000 = 0
 
 . replace dum2000 = 1 if fyear >= 2000
-(27,438 real changes made)
+(27,553 real changes made)
 
 . la var dum2000 "2000s dummy"
 
@@ -51,10 +51,10 @@ Notes:
 (1,688 missing values generated)
 
 . g E = ib + xint + txditc
-(10,021 missing values generated)
+(10,096 missing values generated)
 
 . g NA = at - che
-(378 missing values generated)
+(382 missing values generated)
 
 . g RD = xrd
 
@@ -62,13 +62,13 @@ Notes:
 (0 real changes made)
 
 . g I = xint
-(6,921 missing values generated)
+(6,949 missing values generated)
 
 . g D = dvc
-(657 missing values generated)
+(668 missing values generated)
 
 . g L = che
-(378 missing values generated)
+(382 missing values generated)
 
 . 
 . tsset gvkey fyear
@@ -82,27 +82,27 @@ Notes:
   3.         g d2_`v' = (F2.`v' - `v') / at
   4.         replace `v' = `v' / at
   5. }
-(28,432 missing values generated)
-(28,432 missing values generated)
-(114,965 real changes made)
-(37,208 missing values generated)
-(37,208 missing values generated)
-(106,622 real changes made)
-(26,942 missing values generated)
-(26,942 missing values generated)
-(116,270 real changes made)
-(26,795 missing values generated)
-(26,750 missing values generated)
-(54,567 real changes made, 331 to missing)
-(33,784 missing values generated)
-(33,781 missing values generated)
-(102,847 real changes made, 9 to missing)
-(27,249 missing values generated)
-(27,251 missing values generated)
-(35,385 real changes made, 2 to missing)
-(26,942 missing values generated)
-(26,942 missing values generated)
-(115,377 real changes made)
+(28,988 missing values generated)
+(28,988 missing values generated)
+(115,276 real changes made)
+(37,797 missing values generated)
+(37,797 missing values generated)
+(106,858 real changes made)
+(27,527 missing values generated)
+(27,527 missing values generated)
+(116,577 real changes made)
+(27,388 missing values generated)
+(27,335 missing values generated)
+(54,870 real changes made, 335 to missing)
+(34,336 missing values generated)
+(34,333 missing values generated)
+(103,148 real changes made, 9 to missing)
+(27,835 missing values generated)
+(27,837 missing values generated)
+(35,340 real changes made, 2 to missing)
+(27,527 missing values generated)
+(27,527 missing values generated)
+(115,684 real changes made)
 
 . 
 . reghdfe V E d_E d2_E d_NA d2_NA RD d_RD d2_RD I d_I d2_I D d_D d2_D d2_V L c.
@@ -116,57 +116,57 @@ note: L omitted because of collinearity
 note: 1.dum1990#1.dum2000 omitted because of collinearity
 note: 1.dum1990#1.dum2000#c.L omitted because of collinearity
 
-HDFE Linear regression                            Number of obs   =     58,478
+HDFE Linear regression                            Number of obs   =     57,968
 Absorbing 1 HDFE group                            F(  20,     22) =          .
 Statistics robust to heteroskedasticity           Prob > F        =          .
-                                                  R-squared       =     0.2763
-                                                  Adj R-squared   =     0.2761
-Number of clusters (gvkey)   =      7,717         Within R-sq.    =     0.2763
-Number of clusters (fyear)   =         23         Root MSE        =     1.7055
+                                                  R-squared       =     0.2781
+                                                  Adj R-squared   =     0.2779
+Number of clusters (gvkey)   =      7,775         Within R-sq.    =     0.2781
+Number of clusters (fyear)   =         23         Root MSE        =     1.6913
 
                            (Std. Err. adjusted for 23 clusters in gvkey fyear)
 ------------------------------------------------------------------------------
              |               Robust
            V |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-           E |  -.7961084   .2419991    -3.29   0.003    -1.297984    -.294233
-         d_E |   .1547878   .1121884     1.38   0.182    -.0778767    .3874524
-        d2_E |  -.2125259   .1495721    -1.42   0.169    -.5227195    .0976678
-        d_NA |   .3799304   .0653754     5.81   0.000     .2443501    .5155107
-       d2_NA |   .3117789   .0592648     5.26   0.000     .1888712    .4346865
-          RD |   5.336867   .7053723     7.57   0.000     3.874014    6.799719
-        d_RD |   .4843827   .2214136     2.19   0.040     .0251989    .9435665
-       d2_RD |   2.847359   .7615014     3.74   0.001     1.268101    4.426616
-           I |   4.252964   .8405927     5.06   0.000     2.509681    5.996246
-         d_I |  -5.962128   1.045664    -5.70   0.000    -8.130701   -3.793554
-        d2_I |  -.0962155   .7732381    -0.12   0.902    -1.699813    1.507382
-           D |   5.477044   1.014191     5.40   0.000     3.373741    7.580348
-         d_D |  -1.259766   .2744194    -4.59   0.000    -1.828877   -.6906548
-        d2_D |   1.314371   1.237538     1.06   0.300    -1.252127    3.880869
-        d2_V |  -.0924602   .0469567    -1.97   0.062    -.1898425    .0049221
-           L |   1.865748    .228674     8.16   0.000     1.391507    2.339989
-           L |          0   1.34e-17     0.00   1.000    -2.77e-17    2.77e-17
-   1.dum1990 |   .1697017   .0451338     3.76   0.001     .0760998    .2633035
+           E |  -.8215953   .2644624    -3.11   0.005    -1.370057   -.2731338
+         d_E |   .2053724   .1455015     1.41   0.172    -.0963792    .5071241
+        d2_E |  -.2374496   .1497158    -1.59   0.127    -.5479411     .073042
+        d_NA |   .2629882   .0932096     2.82   0.010     .0696833    .4562932
+       d2_NA |   .2872452   .0564819     5.09   0.000     .1701089    .4043814
+          RD |   5.159321   .6379766     8.09   0.000     3.836238    6.482403
+        d_RD |   .6850854   .2510926     2.73   0.012     .1643511     1.20582
+       d2_RD |   2.832517   .7626833     3.71   0.001     1.250809    4.414226
+           I |   3.589504   .8351482     4.30   0.000     1.857513    5.321495
+         d_I |   -5.03202   1.100808    -4.57   0.000    -7.314957   -2.749083
+        d2_I |   .0066207   .7866378     0.01   0.993    -1.624766    1.638008
+           D |   6.772243   .9515825     7.12   0.000     4.798782    8.745704
+         d_D |  -1.079453   .2438033    -4.43   0.000     -1.58507    -.573836
+        d2_D |   3.538919   .8065973     4.39   0.000     1.866139      5.2117
+        d2_V |  -.0879006   .0477388    -1.84   0.079    -.1869048    .0111036
+           L |   1.822662   .2422744     7.52   0.000     1.320215    2.325108
+           L |          0   5.89e-10     0.00   1.000    -1.22e-09    1.22e-09
+   1.dum1990 |   .1775484   .0479514     3.70   0.001     .0781034    .2769935
              |
  dum1990#c.L |
-          1  |   .4171558   .4597076     0.91   0.374    -.5362194    1.370531
+          1  |   .4199902   .4542099     0.92   0.365    -.5219834    1.361964
              |
-   1.dum2000 |   .0856794   .0613289     1.40   0.176    -.0415089    .2128677
+   1.dum2000 |   .0709273   .0606537     1.17   0.255    -.0548607    .1967154
              |
  dum2000#c.L |
-          1  |  -.8574441   .6632937    -1.29   0.210    -2.233031    .5181428
+          1  |  -.8408081   .6695847    -1.26   0.222    -2.229442    .5478255
              |
      dum1990#|
      dum2000 |
         0 1  |          0  (empty)
-        1 1  |          0  (omitted)
+        1 1  |          0   5.78e-26     0.00   1.000    -1.20e-25    1.20e-25
              |
      dum1990#|
  dum2000#c.L |
         0 1  |          0  (empty)
         1 1  |          0  (omitted)
              |
-       _cons |   .7360299   .0562418    13.09   0.000     .6193915    .8526684
+       _cons |   .7596873    .050326    15.10   0.000     .6553175    .8640571
 ------------------------------------------------------------------------------
 
 . local r2_ : di %4.3f e(r2_a)
@@ -215,20 +215,20 @@ Number of clusters (fyear)   =         23         Root MSE        =     1.7055
 . estadd local r2_ "`r2_'"
 
 added macro:
-                e(r2_) : "0.276"
+                e(r2_) : "0.278"
 
 . 
 . preserve
 
 . keep if at > 100 & fyear == 2004
-(114,214 observations deleted)
+(114,512 observations deleted)
 
 . keep gvkey
 
 . tempfile subsample
 
 . save `subsample'
-file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69712.000002 saved
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St70339.000002 saved
 
 . restore
 
@@ -237,15 +237,15 @@ file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69712.000002 saved
 
     Result                           # of obs.
     -----------------------------------------
-    not matched                        77,792
-        from master                    77,792  (_merge==1)
+    not matched                        78,271
+        from master                    78,271  (_merge==1)
         from using                          0  (_merge==2)
 
-    matched                            38,863  (_merge==3)
+    matched                            38,695  (_merge==3)
     -----------------------------------------
 
 . keep if _merge == 3
-(77,792 observations deleted)
+(78,271 observations deleted)
 
 . 
 . reghdfe V E d_E d2_E d_NA d2_NA RD d_RD d2_RD I d_I d2_I D d_D d2_D d2_V L c.
@@ -259,45 +259,45 @@ note: L omitted because of collinearity
 note: 1.dum1990#1.dum2000 omitted because of collinearity
 note: 1.dum1990#1.dum2000#c.L omitted because of collinearity
 
-HDFE Linear regression                            Number of obs   =     19,819
+HDFE Linear regression                            Number of obs   =     19,604
 Absorbing 1 HDFE group                            F(  20,     22) =          .
 Statistics robust to heteroskedasticity           Prob > F        =          .
-                                                  R-squared       =     0.3016
-                                                  Adj R-squared   =     0.3009
-Number of clusters (gvkey)   =      2,032         Within R-sq.    =     0.3016
-Number of clusters (fyear)   =         23         Root MSE        =     1.1109
+                                                  R-squared       =     0.3021
+                                                  Adj R-squared   =     0.3014
+Number of clusters (gvkey)   =      2,031         Within R-sq.    =     0.3021
+Number of clusters (fyear)   =         23         Root MSE        =     1.0891
 
                            (Std. Err. adjusted for 23 clusters in gvkey fyear)
 ------------------------------------------------------------------------------
              |               Robust
            V |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-           E |   1.103094   .5712619     1.93   0.066    -.0816307    2.287819
-         d_E |  -.0961819   .0992414    -0.97   0.343     -.301996    .1096322
-        d2_E |   .3034205   .2016407     1.50   0.147    -.1147567    .7215978
-        d_NA |   .6076409     .11392     5.33   0.000     .3713853    .8438965
-       d2_NA |   .3533022   .1970334     1.79   0.087      -.05532    .7619243
-          RD |   4.704733   .8613642     5.46   0.000     2.918373    6.491093
-        d_RD |   1.554909   .9271914     1.68   0.108    -.3679687    3.477786
-       d2_RD |   6.180684   1.444142     4.28   0.000     3.185716    9.175652
-           I |  -3.195244   1.258343    -2.54   0.019    -5.804888   -.5856002
-         d_I |  -3.431092   1.468615    -2.34   0.029    -6.476813   -.3853698
-        d2_I |  -4.491178    2.05316    -2.19   0.040    -8.749171   -.2331858
-           D |    7.89634   1.536783     5.14   0.000     4.709247    11.08343
-         d_D |    -1.5106   .3363367    -4.49   0.000     -2.20812   -.8130808
-        d2_D |   2.651583    1.03079     2.57   0.017     .5138552    4.789311
-        d2_V |  -.1011616    .071909    -1.41   0.173    -.2502917    .0479684
-           L |   .9152434   .2351904     3.89   0.001     .4274883    1.402998
-           L |          0   3.83e-17     0.00   1.000    -7.94e-17    7.94e-17
-   1.dum1990 |    .247538   .0684778     3.61   0.002     .1055237    .3895522
+           E |   1.053819   .5462021     1.93   0.067    -.0789347    2.186573
+         d_E |  -.0861564   .0951771    -0.91   0.375    -.2835417    .1112289
+        d2_E |   .2909758   .2070279     1.41   0.174    -.1383739    .7203255
+        d_NA |   .6315778   .1174043     5.38   0.000     .3880962    .8750594
+       d2_NA |   .3112894   .1923965     1.62   0.120    -.0877164    .7102953
+          RD |   4.661316   .8368311     5.57   0.000     2.925835    6.396798
+        d_RD |   1.569654   .9230738     1.70   0.103    -.3446838    3.483992
+       d2_RD |   6.326188    1.42045     4.45   0.000     3.380356     9.27202
+           I |  -1.654119   1.307029    -1.27   0.219    -4.364731    1.056493
+         d_I |  -4.073825   1.543566    -2.64   0.015    -7.274984   -.8726649
+        d2_I |  -3.049505   1.880792    -1.62   0.119    -6.950028    .8510178
+           D |   9.014401    1.67148     5.39   0.000     5.547963    12.48084
+         d_D |  -1.332565   .3069939    -4.34   0.000    -1.969231   -.6958987
+        d2_D |   4.593538   1.037738     4.43   0.000     2.441401    6.745676
+        d2_V |  -.0964377   .0700628    -1.38   0.183    -.2417391    .0488637
+           L |   1.058077   .2408701     4.39   0.000     .5585425    1.557611
+           L |          0   7.02e-10     0.00   1.000    -1.46e-09    1.46e-09
+   1.dum1990 |   .2878435   .0716852     4.02   0.001     .1391774    .4365097
              |
  dum1990#c.L |
-          1  |   1.803488   .7063293     2.55   0.018     .3386503    3.268325
+          1  |   1.642251   .6499288     2.53   0.019     .2943808     2.99012
              |
-   1.dum2000 |   .0379025   .0589875     0.64   0.527      -.08443     .160235
+   1.dum2000 |    .033077   .0595596     0.56   0.584     -.090442     .156596
              |
  dum2000#c.L |
-          1  |  -.7705287    .867012    -0.89   0.384    -2.568602    1.027544
+          1  |  -.6948924   .7922655    -0.88   0.390     -2.33795    .9481656
              |
      dum1990#|
      dum2000 |
@@ -309,7 +309,7 @@ Number of clusters (fyear)   =         23         Root MSE        =     1.1109
         0 1  |          0  (empty)
         1 1  |          0  (omitted)
              |
-       _cons |    .656738   .1007497     6.52   0.000     .4477959    .8656802
+       _cons |   .5797251    .099204     5.84   0.000     .3739887    .7854615
 ------------------------------------------------------------------------------
 
 . local r2_ : di %4.3f e(r2_a)

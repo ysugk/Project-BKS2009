@@ -33,7 +33,7 @@ Notes:
 
 . 
 . gen nlev = lev - cashr
-(750 missing values generated)
+(739 missing values generated)
 
 . 
 . collapse (count) nobs = cashr ///

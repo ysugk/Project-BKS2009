@@ -34,7 +34,7 @@ Notes:
 . 
 . * Same winsorizing
 . replace lev = 1 if lev > 1
-(1,770 real changes made)
+(1,775 real changes made)
 
 . replace lev = 0 if lev < 0
 (0 real changes made)
@@ -59,7 +59,7 @@ Notes:
 . tempfile ind_cfvol
 
 . save `ind_cfvol'
-file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69705.000002 saved
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St70333.000002 saved
 
 . restore
 
@@ -69,7 +69,7 @@ file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69705.000002 saved
     Result                           # of obs.
     -----------------------------------------
     not matched                             0
-    matched                           116,655  (_merge==3)
+    matched                           116,966  (_merge==3)
     -----------------------------------------
 
 . 
@@ -77,7 +77,7 @@ file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69705.000002 saved
 . gen pcashr = 0.307 + 0.230 * ind_cfvol + 0.006 * mtb - 0.009 * size + 0.077 *
 >  ocf - 0.238 * nwc - 0.372 * capx_at - 0.360 * lev + 0.048 * rd - 0.024 * div
 > _dum - 0.233 * aqc_at + 0.158 * nei + 0.190 * ndi
-(30,180 missing values generated)
+(29,916 missing values generated)
 
 . 
 . * Whole sample

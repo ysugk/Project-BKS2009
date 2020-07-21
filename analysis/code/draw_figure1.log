@@ -35,15 +35,15 @@ Notes:
 
 . 
 . bysort fyear: egen size_rank = rank(lag1_at)
-(11,121 missing values generated)
+(11,113 missing values generated)
 
 . bysort fyear: egen size_n = count(lag1_at)
 
 . gen size_pct = (size_rank - 1)/size_n
-(11,121 missing values generated)
+(11,113 missing values generated)
 
 . egen size_group = cut(size_pct), at(0 0.2 0.4 0.6 0.8 1) icodes
-(11,121 missing values generated)
+(11,113 missing values generated)
 
 . collapse (mean) mean_cashr = cashr, by(fyear size_group)
 

@@ -54,7 +54,7 @@ xij variables:
 . tempfile byni
 
 . save `byni'
-file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69695.000002 saved
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St70322.000002 saved
 
 . restore
 
@@ -81,20 +81,20 @@ xij variables:
 . tempfile bydiv
 
 . save `bydiv'
-file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St69695.000004 saved
+file /var/folders/5x/ys8vrl6n4yvbdxjwvb5k0nf00000gn/T//St70322.000004 saved
 
 . restore
 
 . 
 . gen ipo_dum = .
-(116,655 missing values generated)
+(116,966 missing values generated)
 
 . replace ipo_dum = 1 if cyear - year(ipodate2) >= 0 & cyear - year(ipodate2) <
 > = 5
-(45,927 real changes made)
+(46,043 real changes made)
 
 . replace ipo_dum = 0 if cyear - year(ipodate2) > 5
-(70,634 real changes made)
+(70,828 real changes made)
 
 . collapse (mean) byipo_cashr = cashr, by(fyear ipo_dum)
 
